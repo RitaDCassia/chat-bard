@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Inclui a biblioteca jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Chat Vertex AI</title>
+    <!-- Estilos CSS incorporados -->
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: sans-serif;
+            background: rgb(235, 235, 235);
+        }
+
+        .livechat {
+            background: white;
+            position: absolute;
+            right: 2em;
+            bottom: 2em;
+            width: 75%;
+            max-width: 350px;
+            border-radius: 1em;
+            box-shadow: 14px 14px 38px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: #263238;
+            padding: 1em;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            border-top-right-radius: 1em;
+            border-top-left-radius: 1em;
+        }
+
+        h4 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .content {
+            padding: 1em;
+        }
+
+        .chat {
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        /* Estilo para o balão das mensagens do usuário */
+        .message.user {
+            background-color: #263238; /* Cor de fundo azul */
+            color: white; /* Texto em branco */
+            float: right;
+            border-radius: 20px 20px 0 20px; /* Borda arredondada */
+            padding: 10px 15px; /* Espaçamento interno */
+            margin: 10px;
+            clear: both;
+            max-width: 70%; /* Largura máxima para evitar balões muito largos */
+            word-wrap: break-word; /* Quebrar palavras longas */
+        }
+
+        /* Estilo para o balão das mensagens do assistente Tupi */
+        .message.tupi {
+            background-color: #f0f0f0; /* Cor de fundo cinza claro */
+            color: #333;
+            float: left;
+            border-radius: 20px 20px 20px 0; /* Borda arredondada */
+            padding: 1px 15px;
+            margin: 10px;
+            clear: both;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message p.name {
+            font-weight: bold;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        .message p.msg {
+            margin-bottom: 0.5em;
+        }
+
+        .message.user .msg {
+            text-align: right;
+            margin-right: 1em;
+        }
+
+        .send-container {
+            display: grid;
+            grid-template-columns: 70% auto;
+            margin: 1em 0 0.5em;
+            border-radius: 0.7em;
+            box-shadow: 4px 4px 17px rgba(0, 0, 0, 0.12);
+        }
+
+        input[type=text] {
+            padding: 1em;
+            border-top-left-radius: 0.7em;
+            border-bottom-left-radius: 0.7em;
+            border: 1px solid gray;
+        }
+
+        button[type=submit] {
+            padding: 1em;
+            background: #263238;
+            color: white;
+            border: none;
+            border-top-right-radius: 0.7em;
+            border-bottom-right-radius: 0.7em;
+            cursor: pointer;
+        }
+
+        svg.bubble {
+            position: absolute;
+            width: 4em;
+            bottom: 2em;
+            right: 2em;
+            cursor: pointer;
+        }
+
+        svg.exit {
+            width: 1.5em;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Div para exibir o ícone de bate-papo -->
+    <div class="wrapper">
+        <!-- ... Código SVG para o ícone ... -->
+        <svg class="bubble" viewBox="0 0 309 297" fill="none">
+            <ellipse cx="154.5" cy="148.5" rx="154.5" ry="148.5" fill="#263238"/>
+            <path d="M227 144.165C227 180.155 194.762 209.33 155 209.33C147.869 209.34 140.767 208.383 133.877 206.482C128.621 209.237 116.552 214.525 96.248 217.969C94.448 218.267 93.08 216.331 93.791 214.599C96.977 206.817 99.857 196.446 100.721 186.988C89.696 175.538 83 160.55 83 144.165C83 108.175 115.238 79 155 79C194.762 79 227 108.175 227 144.165ZM128 144.165C128 141.696 127.052 139.328 125.364 137.583C123.676 135.837 121.387 134.856 119 134.856C116.613 134.856 114.324 135.837 112.636 137.583C110.948 139.328 110 141.696 110 144.165C110 146.634 110.948 149.002 112.636 150.748C114.324 152.494 116.613 153.475 119 153.475C121.387 153.475 123.676 152.494 125.364 150.748C127.052 149.002 128 146.634 128 144.165ZM164 144.165C164 141.696 163.052 139.328 161.364 137.583C159.676 135.837 157.387 134.856 155 134.856C152.613 134.856 150.324 135.837 148.636 137.583C146.948 139.328 146 141.696 146 144.165C146 146.634 146.948 149.002 148.636 150.748C150.324 152.494 152.613 153.475 155 153.475C157.387 153.475 159.676 152.494 161.364 150.748C163.052 149.002 164 146.634 164 144.165ZM191 153.475C193.387 153.475 195.676 152.494 197.364 150.748C199.052 149.002 200 146.634 200 144.165C200 141.696 199.052 139.328 197.364 137.583C195.676 135.837 193.387 134.856 191 134.856C188.613 134.856 186.324 135.837 184.636 137.583C182.948 139.328 182 141.696 182 144.165C182 146.634 182.948 149.002 184.636 150.748C186.324 152.494 188.613 153.475 191 153.475Z" fill="white"/>
+        </svg>
+    </div>
+
+    <!-- Div para a janela de chat (inicialmente oculta) -->
+    <div class="livechat hidden">
+        <div class="header">
+            <!-- Cabeçalho da janela de chat -->
+            <h4>Tupi o amigo</h4>
+            <!-- Ícone "X" para fechar a janela de chat -->
+            <svg class="exit" viewBox="0 0 19 19" fill="none">
+                <path d="M2.90024 16.3332C1.99289 15.4569 1.26916 14.4086 0.771275 13.2496C0.273389 12.0905 0.0113199 10.844 0.000358689 9.58255C-0.0106026 8.32115 0.229764 7.07019 0.707432 5.90267C1.1851 4.73516 1.8905 3.67447 2.78249 2.78249C3.67447 1.8905 4.73516 1.1851 5.90267 0.707432C7.07019 0.229764 8.32115 -0.0106026 9.58255 0.000358689C10.844 0.0113199 12.0905 0.273389 13.2496 0.771275C14.4086 1.26916 15.4569 1.99289 16.3332 2.90024C18.0637 4.69196 19.0213 7.09168 18.9996 9.58255C18.978 12.0734 17.9789 14.4561 16.2175 16.2175C14.4561 17.9789 12.0734 18.978 9.58255 18.9996C7.09168 19.0213 4.69196 18.0637 2.90024 16.3332ZM10.9467 9.61674L13.6352 6.92824L12.2957 5.58874L9.61674 8.27724L6.92824 5.58874L5.58874 6.92824L8.27724 9.61674L5.58874 12.3052L6.92824 13.6447L9.61674 10.9562L12.3052 13.6447L13.6447 12.3052L10.9562 9.61674H10.9467Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="content">
+            <!-- Conteúdo da janela de chat -->
+            <div class="chat">
+                <!-- Div onde as mensagens serão exibidas -->
+                <div class="chat-box">
+                    {% for message in chat_history %}
+                    <div class="message {% if message.sender == 'user' %}user{% else %}tupi{% endif %}">
+                        <div class="chat-balloon">
+                            <p class="msg">{{ message.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Formulário para enviar mensagens -->
+        <form method="post" class="send-container" id="chat-form" action="/ask">
+            <input type="text" class="message-input" name="pergunta" placeholder="Sua mensagem..." id="user-message">
+            <button type="submit">Enviar</button>
+        </form>
+    </div> 
+
+    <script>
+        $(document).ready(function () {
+            // Função para abrir o chat quando o ícone for clicado
+            $('.bubble').click(function () {
+                $('.livechat').css('height', 'auto');
+                $('.livechat').removeClass('hidden');
+                scrollChatToBottom(); // Rola para a última mensagem quando o chat é aberto
+            });
+        
+            // Função para fechar o chat quando o ícone "X" for clicado
+            $('.exit').click(function (e) {
+                if (e.target === this) {
+                    $('.livechat').css('height', '0');
+                    $('.livechat').addClass('hidden');
+                }
+            });
+        
+            // Função para enviar a pergunta do usuário ao servidor Flask usando AJAX
+            $('#chat-form').submit(function (event) {
+                event.preventDefault(); // Impede o envio do formulário tradicional
+        
+                // Obtenha a pergunta do usuário
+                var pergunta = $('#user-message').val();
+        
+                // Envie a pergunta ao servidor Flask usando AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/ask',
+                    data: { pergunta: pergunta },
+                    success: function (response) {
+                        // Receba a resposta do servidor e adicione-a ao chat
+                        var resposta_do_modelo = response.text;
+                        $('.chat-box').append('<div class="message user"><div class="chat-balloon"><p class="msg">' + pergunta + '</p></div></div>');
+                        $('.chat-box').append('<div class="message tupi"><div class="chat-balloon"><p class="msg">' + resposta_do_modelo + '</p></div></div>');
+        
+                        // Limpe a entrada de mensagem do usuário
+                        $('#user-message').val('');
+        
+                        scrollChatToBottom(); // Rola para a última mensagem após o envio
+                    }
+                });
+            });
+        
+            // Função para rolar a área de chat para a última mensagem
+            function scrollChatToBottom() {
+                var chatBox = $('.chat')[0];
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+        </script>
+</body>
+</html>
