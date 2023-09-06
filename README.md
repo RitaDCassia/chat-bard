@@ -24,5 +24,6 @@ HTML/CSS/JavaScript: A interface do usuário é criada com HTML, estilizada com 
 
 Google Cloud: O projeto usa as credenciais do Google Cloud para autenticação e configuração.
 
-![image](https://github.com/RitaDCassia/chat-bard/assets/117660507/7fd37b85-6d8f-49e3-a54c-7da89e577e32)  ![image](https://github.com/RitaDCassia/chat-bard/assets/117660507/9d6e07dc-ec97-4514-a66d-c279d6a6c88d)
+![image](https://github.com/RitaDCassia/chat-bard/assets/117660507/7fd37b85-6d8f-49e3-a54c-7da89e577e32) 
+![image](https://github.com/RitaDCassia/chat-bard/assets/117660507/b248f489-91a9-46c1-aeaf-3c9b88040ecf)
 
